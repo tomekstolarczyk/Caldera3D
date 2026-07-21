@@ -1,3 +1,4 @@
+# 1. Foldery budowania (CMake)
 /build/
 /out/
 CMakeCache.txt
@@ -6,6 +7,7 @@ Makefile
 cmake_install.cmake
 compile_commands.json
 
+# 2. Skompilowane pliki wykonywalne i biblioteki 
 *.exe
 *.obj
 *.o
@@ -15,20 +17,17 @@ compile_commands.json
 *.so
 *.dylib
 
-.vscode/
+# 3. Ciężkie dane (Chmury punktów)
+data/*
+!data/.gitkeep
 
-Thumbs.db
-.DS_Store
-
-/data/*
+# Dodatkowe zabezpieczenie: ignorujemy rozszerzenia plików 3D wszędzie
 *.ply
 *.pcd
-*.obj
-*.stl
+*.xyz
+*.pts
 
-__pycache__/
-*.pyc
-*.pyd
-*.pyo
-.venv/
-env/
+# 4. Pliki systemowe i konfiguracyjne edytorów
+.vscode/
+.DS_Store
+Thumbs.db
