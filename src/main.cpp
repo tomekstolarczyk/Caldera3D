@@ -1,14 +1,23 @@
+#include <iostream>
 #include "PointCloud.h"
 
 int main() 
 {
+    std::cout << "=================" << std::endl;
+    std::cout << "     Caldera3D   " << std::endl;
+    std::cout << "=================" << std::endl;
+
     PointCloud cloud;
     
-    cloud.addPoint(1.0f, 2.0f, 3.0f);
-    cloud.addPoint(4.0f, 5.0f, 6.0f);
-    
-    std::cout << "Caldera3D Engine started." << std::endl;
-    std::cout << "Loaded points: " << cloud.size() << std::endl;
+    if (cloud.loadFromPLY("../data/test_cloud.ply"))
+    {
+        std::cout << "[SUCCESS] Dane w pamieci" << std::endl;
+        std::cout << "[INFO] Liczba punktow : " << cloud.size() << std::endl;
+    }
+    else
+    {
+        std::cout << "[FATAL] :(" << std::endl;
+    }
     
     return 0;
 }

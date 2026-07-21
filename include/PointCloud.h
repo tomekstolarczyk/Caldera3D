@@ -1,6 +1,6 @@
 #pragma once
 #include <vector> 
-#include <iostream>
+#include <string>
 
 struct Point3D 
 {
@@ -14,10 +14,10 @@ class PointCloud
     std::vector<Point3D> points;
 
 public:
-
+    
     void addPoint(float x, float y, float z)
     {
-        points.push_back({x,y,z});
+        points.push_back({x, y, z});
     }
 
     size_t size() const
@@ -25,4 +25,5 @@ public:
         return points.size();
     }
 
+    bool loadFromPLY(const std::string& filepath);
 };

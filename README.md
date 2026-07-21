@@ -1,6 +1,6 @@
 # Caldera3D 🌋
 
-**Caldera3D** is an ultra-fast 3D Point Cloud Processing engine written in modern C++17.
+**Caldera3D** is an ultra-fast 3D Point Cloud Processing engine written in modern C++.
 
 ## Features (Planned)
 - Fast ASCII/Binary 3D Point Cloud Parser (.ply, .pcd)
