@@ -13,7 +13,7 @@ bool PointCloud::loadData(const std::string& filepath)
     std::string line;
     int vertexCount = 0;
 
-    if (!file.is_open())
+    if (!file.is_open()) 
     {
         std::cerr << "Unable to open file :(" << std::endl;
         return false;
