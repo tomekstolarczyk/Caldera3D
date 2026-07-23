@@ -9,7 +9,7 @@ int main()
 
     PointCloud cloud;
     
-    if (cloud.loadData("data/test_cloud.ply"))
+    if (cloud.loadData("data/table_scene_lms400.ply"))
     {
         std::cout << "[SUCCESS] Dane w pamieci! Letsgo" << std::endl;
         std::cout << "Liczba punktow : " << cloud.size() << std::endl;
