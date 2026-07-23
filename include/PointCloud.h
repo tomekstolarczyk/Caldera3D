@@ -20,10 +20,8 @@ public:
         points.push_back({x, y, z});
     }
 
-    size_t size() const
-    {
-        return points.size();
-    }
+    const std::vector<Point3D>& getPoints () const {return points;}
+    size_t size() const {return points.size();}
 
     bool loadData(const std::string& filepath);
 };

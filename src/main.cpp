@@ -13,6 +13,14 @@ int main()
     {
         std::cout << "[SUCCESS] Dane w pamieci" << std::endl;
         std::cout << "[INFO] Liczba punktow : " << cloud.size() << std::endl;
+
+        std::cout << " Pierwsze 5 punktow chmury :" << std::endl;
+        const std::vector<Point3D>& pts = cloud.getPoints();
+        for(int i = 0; i<5; i++)
+        {
+            std::cout << "Punkt [" << i << "]: X=" << pts[i].x << " | Y=" << pts[i].y << " | Z=" << pts[i].z << std::endl; 
+        }
+
     }
     else
     {
