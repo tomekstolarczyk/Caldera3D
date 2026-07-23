@@ -25,5 +25,5 @@ public:
         return points.size();
     }
 
-    bool loadFromPLY(const std::string& filepath);
+    bool loadData(const std::string& filepath);
 };
