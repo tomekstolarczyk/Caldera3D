@@ -9,16 +9,16 @@ int main()
 
     PointCloud cloud;
     
-    if (cloud.loadData("data/table_scene_lms400.pcd"))
+    if (cloud.loadData("data/test_cloud.ply"))
     {
-        std::cout << "[SUCCESS] Dane w pamieci" << std::endl;
-        std::cout << "[INFO] Liczba punktow : " << cloud.size() << std::endl;
+        std::cout << "[SUCCESS] Dane w pamieci! Letsgo" << std::endl;
+        std::cout << "Liczba punktow : " << cloud.size() << std::endl;
 
-        std::cout << " Pierwsze 5 punktow chmury :" << std::endl;
+        std::cout << "Pierwsze 5 punktow chmury:" << std::endl;
         const std::vector<Point3D>& pts = cloud.getPoints();
         for(int i = 0; i<5; i++)
         {
-            std::cout << "Punkt [" << i << "]: X=" << pts[i].x << " | Y=" << pts[i].y << " | Z=" << pts[i].z << std::endl; 
+            std::cout << "Punkt [" << i << "]: X=" << pts[i].x << ", Y=" << pts[i].y << ", Z=" << pts[i].z << std::endl; 
         }
 
     }

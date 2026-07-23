@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 
+// ply file format
 bool PointCloud::loadData(const std::string& filepath)
 {
     // open file
@@ -11,7 +12,6 @@ bool PointCloud::loadData(const std::string& filepath)
 
     std::string line;
     int vertexCount = 0;
-    bool isPCD = false;
 
     if (!file.is_open())
     {
@@ -28,15 +28,8 @@ bool PointCloud::loadData(const std::string& filepath)
             std::string temp1, temp2;
             iss >> temp1 >> temp2 >> vertexCount;
         }
-        else if (line.find("POINTS") != std::string::npos) // Składnia PCD
-        {
-            std::istringstream iss(line);
-            std::string temp1;
-            iss >> temp1 >> vertexCount;
-            isPCD = true;
-        }
 
-        if (line == "end_header" || line.find("DATA ascii") != std::string::npos) {break;}
+        if (line == "end_header") {break;}
     }
 
     // reserwujemy in advance zeby uniknac reallocow caly czas
@@ -53,9 +46,6 @@ bool PointCloud::loadData(const std::string& filepath)
     }
 
     file.close();
-
-    std::cout << "[INFO] Format: " << (isPCD ? "PCD" : "PLY") 
-    << " | Wczytano punktow: " << points.size() << " / " << vertexCount << std::endl;
 
     return points.size() > 0;
 
