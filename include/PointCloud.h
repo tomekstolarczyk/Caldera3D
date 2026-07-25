@@ -1,8 +1,8 @@
 #pragma once
-#include <vector> 
 #include <string>
+#include <vector>
 
-struct Point3D 
+struct Point3D
 {
     float x;
     float y;
@@ -13,15 +13,20 @@ class PointCloud
 {
     std::vector<Point3D> points;
 
-public:
-    
+  public:
     void addPoint(float x, float y, float z)
     {
         points.push_back({x, y, z});
     }
 
-    const std::vector<Point3D>& getPoints () const {return points;}
-    size_t size() const {return points.size();}
+    const std::vector<Point3D> &getPoints() const
+    {
+        return points;
+    }
+    size_t size() const
+    {
+        return points.size();
+    }
 
-    bool loadData(const std::string& filepath);
+    bool loadData(const std::string &filepath);
 };

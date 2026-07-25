@@ -1,11 +1,11 @@
 #include "PointCloud.h"
-#include <iostream>
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 // ply file format
-bool PointCloud::loadData(const std::string& filepath)
+bool PointCloud::loadData(const std::string &filepath)
 {
     // open file
     std::ifstream file(filepath);
@@ -13,23 +13,26 @@ bool PointCloud::loadData(const std::string& filepath)
     std::string line;
     int vertexCount = 0;
 
-    if (!file.is_open()) 
+    if (!file.is_open())
     {
         std::cerr << "Unable to open file :(" << std::endl;
         return false;
     }
 
     // obsluga headera
-    while(std::getline(file,line))
+    while (std::getline(file, line))
     {
-        if(line.find("element vertex") != std::string::npos)
+        if (line.find("element vertex") != std::string::npos)
         {
             std::istringstream iss(line);
             std::string temp1, temp2;
             iss >> temp1 >> temp2 >> vertexCount;
         }
 
-        if (line == "end_header") {break;}
+        if (line == "end_header")
+        {
+            break;
+        }
     }
 
     // reserwujemy in advance zeby uniknac reallocow caly czas
@@ -37,16 +40,15 @@ bool PointCloud::loadData(const std::string& filepath)
     points.reserve(vertexCount);
 
     // wczytujemy wlasciwe punkty
-    float x,y,z;
-    for(int i = 0; i<vertexCount; i++)
+    float x, y, z;
+    for (int i = 0; i < vertexCount; i++)
     {
         file >> x >> y >> z; // ">>" ignoruje spacje
         addPoint(x, y, z);
-        std::getline(file,line); // przechodzimy do nowej linii
+        std::getline(file, line); // przechodzimy do nowej linii
     }
 
     file.close();
 
     return points.size() > 0;
-
 }
