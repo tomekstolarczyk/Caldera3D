@@ -39,5 +39,12 @@ int main()
                   << ", Z=" << filteredPts[i].z << std::endl;
     }
 
+    // 4 zapisujemy do nowego pliku dla podgladu
+    std::cout << "\n[INFO] Zapisuje zdownsamplowana chmure na dysk..." << std::endl;
+    if (filteredCloud.saveData("data/table_scene_lms400_downsampled.ply"))
+    {
+        std::cout << "[SUCCESS] Nowy plik zapisany!" << std::endl;
+    }
+
     return 0;
 }

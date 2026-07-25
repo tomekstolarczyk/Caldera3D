@@ -38,4 +38,5 @@ class PointCloud
     }
 
     bool loadData(const std::string &filepath);
+    bool saveData(const std::string &filepath) const;
 };
