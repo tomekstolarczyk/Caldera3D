@@ -1,5 +1,5 @@
 #pragma once
-#include "PointCloud.h"
+#include "PointCloud.hpp"
 
 struct voxelBrick
 {

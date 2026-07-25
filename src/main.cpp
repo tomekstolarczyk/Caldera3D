@@ -1,4 +1,5 @@
-#include "PointCloud.h"
+#include "PointCloud.hpp"
+#include "VoxelGrid.hpp"
 #include <iostream>
 
 int main()
@@ -9,22 +10,33 @@ int main()
 
     PointCloud cloud;
 
-    if (cloud.loadData("data/table_scene_lms400.ply"))
+    // 1. Wczytujemy cala chmure do pamieci
+    if (!cloud.loadData("data/table_scene_lms400.ply"))
     {
-        std::cout << "[SUCCESS] Dane w pamieci! Letsgo" << std::endl;
-        std::cout << "Liczba punktow : " << cloud.size() << std::endl;
-
-        std::cout << "Pierwsze 5 punktow chmury:" << std::endl;
-        const std::vector<Point3D> &pts = cloud.getPoints();
-        for (int i = 0; i < 5; i++)
-        {
-            std::cout << "Punkt [" << i << "]: X=" << pts[i].x << ", Y=" << pts[i].y
-                      << ", Z=" << pts[i].z << std::endl;
-        }
+        std::cout << "[FATAL] Nie udalo sie wczytac pliku :(" << std::endl;
+        return -1;
     }
-    else
+
+    std::cout << "[SUCCESS] Dane w pamieci! Letsgo" << std::endl;
+    std::cout << "Liczba punktow PRZED: " << cloud.size() << std::endl;
+
+    // 2. Downsampling - Voxel Grid Filter
+    std::cout << "\n[INFO] Na start voxelizujemy chmure (Voxel Size: 0.05m)..." << std::endl;
+    std::vector<Point3D> downsampledVector = voxelizePointCloud(cloud.getPoints(), 0.05f);
+    PointCloud filteredCloud;
+    filteredCloud.setPoints(downsampledVector);
+
+    std::cout << "Liczba punktow PO:    " << filteredCloud.size() << std::endl;
+
+    // 3 printujemy pierwsze 5 punktow przefiltrowanej chmury
+    int pointsToPrint = std::min(5, (int)filteredCloud.size());
+    std::cout << "\nPierwsze " << pointsToPrint << " punktow nowej chmury:" << std::endl;
+
+    const std::vector<Point3D> &filteredPts = filteredCloud.getPoints();
+    for (int i = 0; i < pointsToPrint; i++)
     {
-        std::cout << "[FATAL] :(" << std::endl;
+        std::cout << "Punkt [" << i << "]: X=" << filteredPts[i].x << ", Y=" << filteredPts[i].y
+                  << ", Z=" << filteredPts[i].z << std::endl;
     }
 
     return 0;

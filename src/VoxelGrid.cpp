@@ -1,6 +1,5 @@
 #include "VoxelGrid.hpp"
 #include <cmath>
-#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -38,9 +37,9 @@ std::vector<Point3D> voxelizePointCloud(const std::vector<Point3D> &points, floa
     for (size_t i = 0; i < points.size(); i++)
     {
         // szukamy pudelka
-        voxelizedX = std::floor((points[i].x - minX) / voxelSize);
-        voxelizedY = std::floor((points[i].y - minY) / voxelSize);
-        voxelizedZ = std::floor((points[i].z - minZ) / voxelSize);
+        voxelizedX = static_cast<int>(std::floor((points[i].x - minX) / voxelSize));
+        voxelizedY = static_cast<int>(std::floor((points[i].y - minY) / voxelSize));
+        voxelizedZ = static_cast<int>(std::floor((points[i].z - minZ) / voxelSize));
 
         // budujemy klucz
         klucz = std::to_string(voxelizedX) + "_" + std::to_string(voxelizedY) + "_" +

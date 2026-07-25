@@ -1,4 +1,4 @@
-#include "PointCloud.h"
+#include "PointCloud.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>
