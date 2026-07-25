@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
 
 // ply file format
 bool PointCloud::loadData(const std::string &filepath)
