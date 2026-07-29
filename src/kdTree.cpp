@@ -1,7 +1,7 @@
-#include "kdTree.hpp"
+#include "KdTree.hpp"
 #include <algorithm>
 
-void build(const std::vector<Point3D> &cloud)
+void KdTree::build(const std::vector<Point3D> &cloud)
 {
 
     if (cloud.empty())
@@ -18,10 +18,19 @@ void build(const std::vector<Point3D> &cloud)
 
     // 2 przekazujemy calosc dalej do faktycznej funkcji budujacej
     // - left/right caly zakres & depth startujacy od 0 (pierwsza wspolrzedna - x)
-    buildRecursive(cloud_paired, 0, cloud.size() - 1, 0);
+    root = buildRecursive(cloud_paired, 0, cloud.size() - 1, 0);
 }
 
-std::unique_ptr<KdTreeNode> buildRecursive(std::vector<std::pair<Point3D, int>> &cloud, int left,
-                                           int right, int depth)
+std::unique_ptr<KdTreeNode> KdTree::buildRecursive(std::vector<std::pair<Point3D, int>> &cloud,
+                                                   int left, int right, int depth)
 {
+    // 1 warunek stopu rekurencji
+
+    // 2 wybieramy os ciecia
+
+    // 3 Przemeblowanie (std::nth_element)
+
+    // 4 doklejamy wezel do drzewa
+
+    // 5 kontynuujemy rekurencje
 }
