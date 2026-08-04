@@ -17,12 +17,12 @@ void KdTree::build(const std::vector<Point3D> &cloud)
 
     for (size_t i = 0; i < cloud.size(); i++)
     {
-        cloud_paired.push_back({cloud[i], i});
+        cloud_paired.push_back({cloud[i], static_cast<int>(i)});
     }
 
     // 2 przekazujemy calosc dalej do faktycznej funkcji budujacej
     // - left/right caly zakres & depth startujacy od 0 (pierwsza wspolrzedna - x)
-    root = buildRecursive(cloud_paired, 0, cloud.size() - 1, 0);
+    root = buildRecursive(cloud_paired, 0, static_cast<int>(cloud.size() - 1), 0);
 }
 
 std::unique_ptr<KdTreeNode> KdTree::buildRecursive(std::vector<std::pair<Point3D, int>> &cloud,

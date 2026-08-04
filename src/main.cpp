@@ -1,5 +1,7 @@
+#include "KdTree.hpp"
 #include "PointCloud.hpp"
 #include "VoxelGrid.hpp"
+#include <chrono> // for time measures
 #include <iostream>
 
 int main()
@@ -45,6 +47,19 @@ int main()
     {
         std::cout << "[SUCCESS] Nowy plik zapisany!" << std::endl;
     }
+
+    // 5. budujemy z chmury punktow kdtree
+    std::cout << "\n[INFO] Rozpoczynam budowe KD-Tree dla " << filteredCloud.size() << " punktow..."
+              << std::endl;
+
+    KdTree tree;
+    auto start = std::chrono::high_resolution_clock::now();
+    tree.build(filteredCloud.getPoints());
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> ms_double = end - start;
+    std::cout << "[SUCCESS] Drzewo KD-Tree zbudowane pomyslnie! (Brak bledow)" << std::endl;
+    std::cout << "[CZAS] Budowa drzewa zajela: " << ms_double.count() << " milisekund!\n"
+              << std::endl;
 
     return 0;
 }
