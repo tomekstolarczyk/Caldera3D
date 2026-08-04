@@ -68,7 +68,11 @@ std::unique_ptr<KdTreeNode> KdTree::buildRecursive(std::vector<std::pair<Point3D
 }
 
 // -----------------------------------------------------------------
-// 2 NEAREST NEIGHBOURS
+// 2 K-NEAREST NEIGHBOURS SEARCH
 // -----------------------------------------------------------------
 
-// todo
+std::vector<Point3D> searchKnn(std::vector<Point3D> &cloud) {}
+
+// -----------------------------------------------------------------
+// 3 RADIUS SEARCH
+// -----------------------------------------------------------------

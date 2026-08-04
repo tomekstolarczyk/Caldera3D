@@ -33,4 +33,5 @@ class KdTree
     KdTree() : root(nullptr) {}
 
     void build(const std::vector<Point3D> &cloud);
+    std::vector<Point3D> searchKnn(const std::vector<Point3D> &cloud, int k);
 };
