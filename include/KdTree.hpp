@@ -1,7 +1,9 @@
 #pragma once
 #include "PointCloud.hpp"
 #include <memory>
+#include <queue>
 
+// glowna struktura wezla drzewa
 struct KdTreeNode
 {
     Point3D point;
@@ -17,6 +19,19 @@ struct KdTreeNode
     }
 };
 
+// stuktura pomocnicza dla kolejki priorytetowej kNN
+struct Neighbour
+{
+    float distance;
+    int index;
+
+    // przeciazamy operator porownania - konieczne do kolejki priorytetowej
+    bool operator<(const Neighbour &other) const
+    {
+        return distance < other.distance;
+    }
+};
+
 class KdTree
 {
     std::unique_ptr<KdTreeNode> root;
@@ -27,11 +42,13 @@ class KdTree
     // - depth - os ciecia - x / y / z
     std::unique_ptr<KdTreeNode> buildRecursive(std::vector<std::pair<Point3D, int>> &cloud,
                                                int left, int right, int depth);
+    void searchKnnRecursive(const KdTreeNode *node, const Point3D &target, int k,
+                            std::priority_queue<Neighbour> &maxHeap) const;
 
   public:
     // member initializer list
     KdTree() : root(nullptr) {}
 
     void build(const std::vector<Point3D> &cloud);
-    std::vector<Point3D> searchKnn(const std::vector<Point3D> &cloud, int k);
+    std::vector<int> searchKnn(const Point3D &target, int k) const;
 };
