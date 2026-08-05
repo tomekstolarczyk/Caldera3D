@@ -71,7 +71,50 @@ std::unique_ptr<KdTreeNode> KdTree::buildRecursive(std::vector<std::pair<Point3D
 // 2 K-NEAREST NEIGHBOURS SEARCH
 // -----------------------------------------------------------------
 
-std::vector<Point3D> searchKnn(std::vector<Point3D> &cloud) {}
+// helper function
+static float distSquared(const Point3D &a, const Point3D &b)
+{
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    float dz = a.z - b.z;
+    return dx * dx + dy * dy + dz * dz;
+}
+
+std::vector<int> KdTree::searchKnn(const Point3D &target, int k) const
+{
+    // 1. vector result initialization and edge cases handling
+    std::vector<int> result; // bedziemy zwracali indeksy punktow - stad sam int wystarczy
+    if (root == NULL || k <= 0)
+    {
+        return result;
+    }
+
+    // 2. kolejka priorytetowa - bedziemy trzymac tu k najblizszych sasiadow
+    // wybralismy ta stukture bo daje ona dostep do max elementu w O(1)
+    std::priority_queue<Neighbour> maxHeap;
+
+    // 3. wywolanie rekurencyjne funkcji ktora wypelni nasza kolejke
+    searchKnnRecursive(root.get(), target, k, maxHeap);
+
+    // 4. przepakowujemy z kolejki do wektora wynikow
+    result.reserve(maxHeap.size());
+    while (!maxHeap.empty())
+    {
+        result.push_back(maxHeap.top().index);
+        maxHeap.pop();
+    }
+
+    // 5. kolejka oddaje elementy od najdalszego do najblizszego wiec odwracamy wektor result
+    std::reverse(result.begin(), result.end());
+
+    return result;
+}
+
+void KdTree::searchKnnRecursive(const KdTreeNode *node, const Point3D &target, int k,
+                                std::priority_queue<Neighbour> &maxHeap) const
+{
+    // TODO
+}
 
 // -----------------------------------------------------------------
 // 3 RADIUS SEARCH
