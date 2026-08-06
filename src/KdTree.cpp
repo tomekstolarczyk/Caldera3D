@@ -113,7 +113,60 @@ std::vector<int> KdTree::searchKnn(const Point3D &target, int k) const
 void KdTree::searchKnnRecursive(const KdTreeNode *node, const Point3D &target, int k,
                                 std::priority_queue<Neighbour> &maxHeap) const
 {
-    // TODO
+    // 1. empty - warunek stopu rekurencji
+    if (!node)
+    {
+        return;
+    }
+
+    // 2. odleglosc right now
+    float dist = distSquared(node->point, target);
+
+    // 3. dorzucamy punkt do kolejki priorytetowej
+    if (static_cast<int>(maxHeap.size()) < k)
+    {
+        maxHeap.push({dist, node->cloudIndex});
+    }
+    else
+    {
+        if (maxHeap.top().distance > dist)
+        {
+            maxHeap.pop();
+            maxHeap.push({dist, node->cloudIndex});
+        }
+    }
+
+    // 4. ustalamy kierunek rekurencji dla nastepnych wezlow
+    float diff = 0.0f;
+    if (node->axis == 0)
+    {
+        diff = target.x - node->point.x;
+    }
+    else if (node->axis == 1)
+    {
+        diff = target.y - node->point.y;
+    }
+    else
+    {
+        diff = target.z - node->point.z;
+    }
+
+    // 5. ustalamy kierunek rekurencji
+    const KdTreeNode *first = diff < 0 ? node->left.get() : node->right.get();
+    const KdTreeNode *second = diff < 0 ? node->right.get() : node->left.get();
+
+    // 6. faktyczna rekurencja dla pierwszego
+    searchKnnRecursive(first, target, k, maxHeap);
+
+    // teraz idzie calosc przejscia dla calej lewej galezi ...
+
+    // 7. i dopiero backtracking dla drugiego, w dwoch mozliwych sytuajach
+    // a) jesli podium nie zostalo jeszcze zapelnione
+    // lub b) jesli odleglosc najwiekszego wieksza od dystansu do "najblizszej sciany"
+    if (static_cast<int>(maxHeap.size()) < k || maxHeap.top().distance > diff * diff)
+    {
+        searchKnnRecursive(second, target, k, maxHeap);
+    }
 }
 
 // -----------------------------------------------------------------
