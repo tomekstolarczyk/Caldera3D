@@ -61,5 +61,32 @@ int main()
     std::cout << "[CZAS] Budowa drzewa zajela: " << ms_double.count() << " milisekund!\n"
               << std::endl;
 
+    // 6. test knn: szukamy K=5 najbliższych sąsiadów dla pierwszego punktu z chmury
+    if (!filteredPts.empty())
+    {
+        Point3D target = filteredPts[0]; // Punkt docelowy
+        int k = 5;
+
+        std::cout << "[INFO] Szukam K=" << k << " najblizszych sasiadow dla punktu (X=" << target.x
+                  << ", Y=" << target.y << ", Z=" << target.z << ")..." << std::endl;
+
+        auto start_knn = std::chrono::high_resolution_clock::now();
+        std::vector<int> neighborIndices = tree.searchKnn(target, k);
+        auto end_knn = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double, std::milli> knn_ms = end_knn - start_knn;
+
+        std::cout << "[SUCCESS] Znaleziono " << neighborIndices.size() << " sasiadow w czasie "
+                  << knn_ms.count() << " ms!" << std::endl;
+
+        for (size_t i = 0; i < neighborIndices.size(); ++i)
+        {
+            int idx = neighborIndices[i];
+            const Point3D &p = filteredPts[idx];
+            std::cout << "  Sasiad " << i + 1 << " [Indeks " << idx << "]: X=" << p.x
+                      << ", Y=" << p.y << ", Z=" << p.z << std::endl;
+        }
+    }
+
     return 0;
 }
