@@ -186,3 +186,48 @@ std::vector<int> KdTree::searchRadius(const Point3D &target, float radius) const
 
     return results;
 }
+
+void KdTree::searchRadiusRecursive(const KdTreeNode *node, const Point3D &target, float radius,
+                                   std::vector<int> &results) const
+{
+    // 1 end recurr
+    if (!node)
+    {
+        return;
+    }
+
+    // 2 add to results
+    float dist = distSquared(node->point, target);
+    if (dist <= radius)
+    {
+        results.push_back(node->cloudIndex);
+    }
+
+    // 3 odl targetu do plaszyczyny ciecia
+    float diff = 0.0f;
+    if (node->axis == 0)
+    {
+        diff = target.x - node->point.x;
+    }
+    else if (node->axis == 1)
+    {
+        diff = target.y - node->point.y;
+    }
+    else
+    {
+        diff = target.z - node->point.z;
+    }
+
+    // 4 wybor kierunku rekurencji
+    const KdTreeNode *first = diff > 0 ? node->right.get() : node->left.get();
+    const KdTreeNode *second = diff > 0 ? node->left.get() : node->right.get();
+
+    // 5 ciag dalszy rekurencji
+    searchRadiusRecursive(first, target, radius, results);
+
+    // 6 backtracking
+    if (radius >= diff * diff)
+    {
+        searchRadiusRecursive(second, target, radius, results);
+    }
+}
