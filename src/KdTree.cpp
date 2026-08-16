@@ -172,3 +172,17 @@ void KdTree::searchKnnRecursive(const KdTreeNode *node, const Point3D &target, i
 // -----------------------------------------------------------------
 // 3 RADIUS SEARCH
 // -----------------------------------------------------------------
+
+std::vector<int> KdTree::searchRadius(const Point3D &target, float radius) const
+{
+    std::vector<int> results;
+    if (!root || radius <= 0)
+    {
+        return results;
+    }
+
+    float radius_sq = radius * radius;
+    searchRadiusRecursive(root.get(), target, radius_sq, results);
+
+    return results;
+}

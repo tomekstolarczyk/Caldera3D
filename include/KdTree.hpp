@@ -47,7 +47,7 @@ class KdTree
                             std::priority_queue<Neighbour> &maxHeap) const;
 
     void searchRadiusRecursive(const KdTreeNode *node, const Point3D &target, float radius,
-                               std::vector<int> results) const;
+                               std::vector<int> &results) const;
 
   public:
     // member initializer list
