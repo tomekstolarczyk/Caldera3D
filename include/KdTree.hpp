@@ -42,13 +42,19 @@ class KdTree
     // - depth - os ciecia - x / y / z
     std::unique_ptr<KdTreeNode> buildRecursive(std::vector<std::pair<Point3D, int>> &cloud,
                                                int left, int right, int depth);
+
     void searchKnnRecursive(const KdTreeNode *node, const Point3D &target, int k,
                             std::priority_queue<Neighbour> &maxHeap) const;
+
+    void searchRadiusRecursive(const KdTreeNode *node, const Point3D &target, float radius,
+                               std::vector<int> results) const;
 
   public:
     // member initializer list
     KdTree() : root(nullptr) {}
 
     void build(const std::vector<Point3D> &cloud);
+
     std::vector<int> searchKnn(const Point3D &target, int k) const;
+    std::vector<int> searchRadius(const Point3D &target, float radius) const;
 };
