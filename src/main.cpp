@@ -1,8 +1,30 @@
 #include "KdTree.hpp"
 #include "PointCloud.hpp"
 #include "VoxelGrid.hpp"
-#include <chrono> // for time measures
+#include <algorithm> // std::min, std::sort
+#include <chrono>    // pomiar czasu
 #include <iostream>
+#include <vector>
+
+// just for testing
+static std::vector<int> bruteForceRadius(const std::vector<Point3D> &cloud, const Point3D &target,
+                                         float radius)
+{
+    std::vector<int> indices;
+    float r_sq = radius * radius;
+
+    for (size_t i = 0; i < cloud.size(); ++i)
+    {
+        float dx = cloud[i].x - target.x;
+        float dy = cloud[i].y - target.y;
+        float dz = cloud[i].z - target.z;
+        if (dx * dx + dy * dy + dz * dz <= r_sq)
+        {
+            indices.push_back(static_cast<int>(i));
+        }
+    }
+    return indices;
+}
 
 int main()
 {
@@ -30,8 +52,8 @@ int main()
 
     std::cout << "Liczba punktow PO:    " << filteredCloud.size() << std::endl;
 
-    // 3 printujemy pierwsze 5 punktow przefiltrowanej chmury
-    int pointsToPrint = std::min(5, (int)filteredCloud.size());
+    // 3. Printujemy pierwsze 5 punktow przefiltrowanej chmury
+    int pointsToPrint = std::min(5, static_cast<int>(filteredCloud.size()));
     std::cout << "\nPierwsze " << pointsToPrint << " punktow nowej chmury:" << std::endl;
 
     const std::vector<Point3D> &filteredPts = filteredCloud.getPoints();
@@ -41,50 +63,80 @@ int main()
                   << ", Z=" << filteredPts[i].z << std::endl;
     }
 
-    // 4 zapisujemy do nowego pliku dla podgladu
+    // 4. Zapisujemy do nowego pliku dla podgladu
     std::cout << "\n[INFO] Zapisuje zdownsamplowana chmure na dysk..." << std::endl;
     if (filteredCloud.saveData("data/table_scene_lms400_downsampled.ply"))
     {
         std::cout << "[SUCCESS] Nowy plik zapisany!" << std::endl;
     }
 
-    // 5. budujemy z chmury punktow kdtree
+    // 5. Budujemy z chmury punktow KD-Tree
     std::cout << "\n[INFO] Rozpoczynam budowe KD-Tree dla " << filteredCloud.size() << " punktow..."
               << std::endl;
 
     KdTree tree;
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start_build = std::chrono::high_resolution_clock::now();
     tree.build(filteredCloud.getPoints());
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> ms_double = end - start;
-    std::cout << "[SUCCESS] Drzewo KD-Tree zbudowane pomyslnie! (Brak bledow)" << std::endl;
-    std::cout << "[CZAS] Budowa drzewa zajela: " << ms_double.count() << " milisekund!\n"
-              << std::endl;
+    auto end_build = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> build_ms = end_build - start_build;
+    std::cout << "[SUCCESS] Drzewo KD-Tree zbudowane pomyslnie!" << std::endl;
+    std::cout << "[CZAS] Budowa drzewa zajela: " << build_ms.count() << " ms\n" << std::endl;
 
-    // 6. test knn: szukamy K=5 najbliższych sąsiadów dla pierwszego punktu z chmury
+    // 6. Test KNN: szukamy K=5 najbliższych sąsiadów
     if (!filteredPts.empty())
     {
-        Point3D target = filteredPts[0]; // Punkt docelowy
+        Point3D target = filteredPts[0];
         int k = 5;
 
-        std::cout << "[INFO] Szukam K=" << k << " najblizszych sasiadow dla punktu (X=" << target.x
-                  << ", Y=" << target.y << ", Z=" << target.z << ")..." << std::endl;
+        std::cout << "[INFO] Szukam K=" << k << " najblizszych sasiadow..." << std::endl;
 
         auto start_knn = std::chrono::high_resolution_clock::now();
         std::vector<int> neighborIndices = tree.searchKnn(target, k);
         auto end_knn = std::chrono::high_resolution_clock::now();
 
         std::chrono::duration<double, std::milli> knn_ms = end_knn - start_knn;
-
         std::cout << "[SUCCESS] Znaleziono " << neighborIndices.size() << " sasiadow w czasie "
                   << knn_ms.count() << " ms!" << std::endl;
+    }
 
-        for (size_t i = 0; i < neighborIndices.size(); ++i)
+    // 7. TEST RADIUS SEARCH
+    if (!filteredPts.empty())
+    {
+        Point3D target = filteredPts[0];
+        float radius = 0.10f; // szukamy w promieniu 10 cm
+
+        std::cout << "\n[INFO] Szukam punktow w promieniu R=" << radius << "m wokol celu..."
+                  << std::endl;
+
+        // A. Wykonanie zapytania przez KD-Tree
+        auto start_radius = std::chrono::high_resolution_clock::now();
+        std::vector<int> kd_results = tree.searchRadius(target, radius);
+        auto end_radius = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> radius_ms = end_radius - start_radius;
+
+        // B. Wykonanie zapytania referencyjnego (Brute-Force)
+        std::vector<int> brute_results = bruteForceRadius(filteredPts, target, radius);
+
+        std::cout << "[CZAS] KD-Tree Radius Search: " << radius_ms.count() << " ms" << std::endl;
+        std::cout << "[INFO] Liczba znalezionych punktow: " << kd_results.size() << std::endl;
+
+        // C. Porównanie wyników
+        std::sort(kd_results.begin(), kd_results.end());
+        std::sort(brute_results.begin(), brute_results.end());
+
+        if (kd_results == brute_results)
         {
-            int idx = neighborIndices[i];
-            const Point3D &p = filteredPts[idx];
-            std::cout << "  Sasiad " << i + 1 << " [Indeks " << idx << "]: X=" << p.x
-                      << ", Y=" << p.y << ", Z=" << p.z << std::endl;
+            std::cout << "[TEST PASSED] Weryfikacja 100% sukcesu: KD-Tree zwrocilo identyczne "
+                         "punkty co Brute-Force!\n"
+                      << std::endl;
+        }
+        else
+        {
+            std::cout << "[TEST FAILED] BŁĄD LOGIKI: Rozbieznosc pomiedzy KD-Tree a Brute-Force!"
+                      << std::endl;
+            std::cout << "KD-Tree znalazlo: " << kd_results.size()
+                      << " punktow, a Brute-Force: " << brute_results.size() << " punktow."
+                      << std::endl;
         }
     }
 
