@@ -6,4 +6,5 @@
 #include "PointCloud.hpp"
 #include <vector>
 
-std::vector<int> filterSOR(const KdTree &tree, int k, float alpha);
+std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tree, int k,
+                           float alpha);
