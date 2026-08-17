@@ -1,5 +1,6 @@
 #include "KdTree.hpp"
 #include "PointCloud.hpp"
+#include "StatisticalOutlierRemoval.hpp"
 #include "VoxelGrid.hpp"
 #include <algorithm> // std::min, std::sort
 #include <chrono>    // pomiar czasu
@@ -136,6 +137,44 @@ int main()
                       << std::endl;
             std::cout << "KD-Tree znalazlo: " << kd_results.size()
                       << " punktow, a Brute-Force: " << brute_results.size() << " punktow."
+                      << std::endl;
+        }
+    }
+
+    // 8. TEST SOR FILTER (Usuwanie szumu)
+    if (!filteredPts.empty())
+    {
+        // Ustawiamy k=50 sasiadow i próg alpha=1.0
+        int sor_k = 50;
+        float sor_alpha = 1.0f;
+        std::cout << "[INFO] Uruchamiam filtr SOR (k=" << sor_k << ", alpha=" << sor_alpha << ")..."
+                  << std::endl;
+
+        auto start_sor = std::chrono::high_resolution_clock::now();
+        std::vector<int> inliers = filterSOR(filteredPts, tree, sor_k, sor_alpha);
+        auto end_sor = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double, std::milli> sor_ms = end_sor - start_sor;
+        std::cout << "[CZAS] Filtr SOR zajal: " << sor_ms.count() << " ms" << std::endl;
+        std::cout << "[INFO] Liczba inlierow: " << inliers.size() << " (usunieto "
+                  << (filteredPts.size() - inliers.size()) << " punktow szumu!)" << std::endl;
+
+        // Wyciąganie poprawnych punktów na podstawie zwróconych indeksów
+        std::vector<Point3D> cleanPoints;
+        cleanPoints.reserve(inliers.size());
+        for (int idx : inliers)
+        {
+            cleanPoints.push_back(filteredPts[idx]);
+        }
+
+        // Zapis do pliku
+        PointCloud cleanCloud;
+        cleanCloud.setPoints(cleanPoints);
+
+        std::cout << "[INFO] Zapisuje odszumiona chmure na dysk..." << std::endl;
+        if (cleanCloud.saveData("data/table_scene_lms400_sor_filtered.ply"))
+        {
+            std::cout << "[SUCCESS] Plik table_scene_lms400_sor_filtered.ply zapisany pomyslnie!\n"
                       << std::endl;
         }
     }

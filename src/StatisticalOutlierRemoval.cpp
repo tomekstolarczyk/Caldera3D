@@ -1,4 +1,5 @@
 #include "StatisticalOutlierRemoval.hpp"
+#include <cmath>
 
 std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tree, int k,
                            float alpha)
@@ -39,7 +40,7 @@ std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tre
             float dx = (points[indexy[j]].x - points[i].x);
             float dy = (points[indexy[j]].y - points[i].y);
             float dz = (points[indexy[j]].z - points[i].z);
-            dist += sqrt(dx * dx + dy * dy + dz * dz);
+            dist += static_cast<float>(std::sqrt(dx * dx + dy * dy + dz * dz));
         }
 
         dist = dist / (indexy.size() - 1);
@@ -59,7 +60,7 @@ std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tre
     }
 
     // 5. odchylenie standardowe
-    float stddev = sqrt(var);
+    float stddev = static_cast<float>(sqrt(var));
 
     // 6. prog odcinajacy
     float threshold = global_mean + alpha * stddev;
