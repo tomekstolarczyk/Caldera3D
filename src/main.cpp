@@ -145,7 +145,7 @@ int main()
     if (!filteredPts.empty())
     {
         // Ustawiamy k=50 sasiadow i próg alpha=1.0
-        int sor_k = 50;
+        int sor_k = 10;
         float sor_alpha = 1.0f;
         std::cout << "[INFO] Uruchamiam filtr SOR (k=" << sor_k << ", alpha=" << sor_alpha << ")..."
                   << std::endl;
