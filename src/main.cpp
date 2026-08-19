@@ -47,6 +47,7 @@ int main()
     std::cout << "Liczba punktow PRZED (RAW): " << rawCloud.size() << std::endl;
 
     // 2. Pass-Through Filter - Wycinamy obszar roboczy
+    // useless rn but works
     BoundingBox roi;
     roi.minX = -1.0f;
     roi.maxX = 1.0f;
