@@ -47,7 +47,7 @@ int main()
 
     // 2. Downsampling - Voxel Grid Filter
     std::cout << "\n[INFO] Na start voxelizujemy chmure (Voxel Size: 0.05m)..." << std::endl;
-    std::vector<Point3D> downsampledVector = voxelizePointCloud(cloud.getPoints(), 0.05f);
+    std::vector<Point3D> downsampledVector = voxelizePointCloud(cloud.getPoints(), 0.01f);
     PointCloud filteredCloud;
     filteredCloud.setPoints(downsampledVector);
 
@@ -145,8 +145,8 @@ int main()
     if (!filteredPts.empty())
     {
         // Ustawiamy k=50 sasiadow i próg alpha=1.0
-        int sor_k = 10;
-        float sor_alpha = 1.0f;
+        int sor_k = 50;
+        float sor_alpha = 2.0f;
         std::cout << "[INFO] Uruchamiam filtr SOR (k=" << sor_k << ", alpha=" << sor_alpha << ")..."
                   << std::endl;
 

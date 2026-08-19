@@ -60,7 +60,7 @@ std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tre
     }
 
     // 5. odchylenie standardowe
-    float stddev = static_cast<float>(sqrt(var));
+    float stddev = static_cast<float>(std::sqrt(var));
 
     // 6. prog odcinajacy
     float threshold = global_mean + alpha * stddev;
