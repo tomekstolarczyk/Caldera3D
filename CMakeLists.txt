@@ -10,4 +10,5 @@ add_executable(caldera
     src/KdTree.cpp 
     src/StatisticalOutlierRemoval.cpp
     src/PassThroughFilter.cpp
+    src/Ransac.cpp
 )

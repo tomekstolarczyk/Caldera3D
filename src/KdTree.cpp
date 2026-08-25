@@ -1,4 +1,5 @@
 #include "KdTree.hpp"
+#include <Math.hpp>
 #include <algorithm>
 
 // -----------------------------------------------------------------
@@ -71,15 +72,6 @@ std::unique_ptr<KdTreeNode> KdTree::buildRecursive(std::vector<std::pair<Point3D
 // 2 K-NEAREST NEIGHBOURS SEARCH
 // -----------------------------------------------------------------
 
-// helper function
-static float distSquared(const Point3D &a, const Point3D &b)
-{
-    float dx = a.x - b.x;
-    float dy = a.y - b.y;
-    float dz = a.z - b.z;
-    return dx * dx + dy * dy + dz * dz;
-}
-
 std::vector<int> KdTree::searchKnn(const Point3D &target, int k) const
 {
     // 1. vector result initialization and edge cases handling
@@ -120,7 +112,7 @@ void KdTree::searchKnnRecursive(const KdTreeNode *node, const Point3D &target, i
     }
 
     // 2. odleglosc right now
-    float dist = distSquared(node->point, target);
+    float dist = Math3D::distSquared(node->point, target);
 
     // 3. dorzucamy punkt do kolejki priorytetowej
     if (static_cast<int>(maxHeap.size()) < k)
@@ -197,7 +189,7 @@ void KdTree::searchRadiusRecursive(const KdTreeNode *node, const Point3D &target
     }
 
     // 2 add to results
-    float dist = distSquared(node->point, target);
+    float dist = Math3D::distSquared(node->point, target);
     if (dist <= radius)
     {
         results.push_back(node->cloudIndex);
