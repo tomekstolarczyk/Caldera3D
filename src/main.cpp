@@ -183,33 +183,36 @@ int main()
         }
     }
 
-    // 10. TEST RANSAC (Wykrywanie płaszczyzny stołu)
+    // 10. TEST RANSAC
     if (!cleanPoints.empty())
     {
         int ransac_iter = 1000;
         float ransac_threshold = 0.015f;
 
-        std::cout << "\n[INFO] Uruchamiam RANSAC (Iteracje: " << ransac_iter
-                  << ", Prog: " << ransac_threshold << "m)..." << std::endl;
+        std::cout << "\n[INFO] Uruchamiam RANSAC #1 (Szukanie podlogi)..." << std::endl;
+        // 1 Wyciągamy pierwszą największą płaszczyznę
+        auto [floorInliers, floorOutliers] = findPlanes(cleanPoints, ransac_iter, ransac_threshold);
 
-        auto start_ransac = std::chrono::high_resolution_clock::now();
-        // Odbieramy pare wektorow
+        std::cout << "[INFO] Uruchamiam RANSAC #2 (Szukanie stolu wsrod reszty)..." << std::endl;
+        // 2 Wpuszczamy resztę chmury i znajdujemy drugą największą płaszczyznę
         auto [tableInliers, objectsOutliers] =
-            findPlanes(cleanPoints, ransac_iter, ransac_threshold);
-        auto end_ransac = std::chrono::high_resolution_clock::now();
+            findPlanes(floorOutliers, ransac_iter, ransac_threshold);
 
-        std::chrono::duration<double, std::milli> ransac_ms = end_ransac - start_ransac;
-
-        std::cout << "[CZAS] RANSAC zajal: " << ransac_ms.count() << " ms" << std::endl;
+        std::cout << "[INFO] Znaleziono podloge: " << floorInliers.size() << " punktow."
+                  << std::endl;
         std::cout << "[INFO] Znaleziono blat stolu: " << tableInliers.size() << " punktow."
                   << std::endl;
-        std::cout << "[INFO] Wyizolowano obiekty: " << objectsOutliers.size() << " punktow."
-                  << std::endl;
+        std::cout << "[INFO] Wyizolowano obiekty (na stole): " << objectsOutliers.size()
+                  << " punktow." << std::endl;
 
-        PointCloud tableCloud;
-        tableCloud.setPoints(tableInliers);
-        tableCloud.saveData("data/table_scene_lms400_ransac_table.ply");
+        // 3 Łączymy podłogę i stół
+        std::vector<Point3D> combinedPlanes = floorInliers;
+        combinedPlanes.insert(combinedPlanes.end(), tableInliers.begin(), tableInliers.end());
+        PointCloud planesCloud;
+        planesCloud.setPoints(combinedPlanes);
+        planesCloud.saveData("data/table_scene_lms400_ransac_table.ply");
 
+        // 4  Zapisujemy czyste obiekty do pliku objects
         PointCloud objectsCloud;
         objectsCloud.setPoints(objectsOutliers);
         objectsCloud.saveData("data/table_scene_lms400_ransac_objects.ply");
