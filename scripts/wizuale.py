@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt # fixed: dodano .pyplot
 
 # 1. dane
 cloud_orig = o3d.io.read_point_cloud("data/table_scene_lms400.ply")
-cloud_down = o3d.io.read_point_cloud("data/table_scene_lms400_downsampled.ply")
+cloud_down = o3d.io.read_point_cloud("data/table_scene_lms400_voxel_downsampled.ply")
 cloud_sor = o3d.io.read_point_cloud("data/table_scene_lms400_sor_filtered.ply")
 
 # 2. kolory

@@ -2,7 +2,8 @@
 #include "Math.hpp"
 #include <random>
 
-std::vector<Point3D> findPlanes(const std::vector<Point3D> &cloud, int k, float threshold)
+std::pair<std::vector<Point3D>, std::vector<Point3D>> findPlanes(const std::vector<Point3D> &cloud,
+                                                                 int k, float threshold)
 {
     // okej a wiec  PRZEPIS:
     // x 1 losujemy 3 punkty z chmury
@@ -22,10 +23,10 @@ std::vector<Point3D> findPlanes(const std::vector<Point3D> &cloud, int k, float 
 
     // rng
     std::mt19937 mt{std::random_device{}()};
-    std::uniform_int_distribution<int> dist(0, cloud.size() - 1);
+    std::uniform_int_distribution<int> dist(0, static_cast<int>(cloud.size() - 1));
 
     // 5 wybieramy najlepsza
-    std::vector<Point3D> inlinersBest;
+    std::vector<int> bestInliersIndices;
     int maxCount = 0;
 
     // 4 powtarzamy proces k razy
@@ -72,26 +73,49 @@ std::vector<Point3D> findPlanes(const std::vector<Point3D> &cloud, int k, float 
             continue;
         }
 
-        std::vector<Point3D> inliners;
+        std::vector<int> inliners;
         inliners.reserve(cloud.size());
         for (int i = 0; i < cloud.size(); i++)
         {
 
             float nom = std::abs(A * cloud[i].x + B * cloud[i].y + C * cloud[i].z + D);
-            float d = nom / denom;
 
-            if (d <= threshold)
+            if (nom / denom <= threshold)
             {
-                inliners.push_back(cloud[i]);
+                inliners.push_back(i);
             }
         }
 
         if (inliners.size() > maxCount)
         {
             maxCount = static_cast<int>(inliners.size());
-            inlinersBest = std::move(inliners);
+            bestInliersIndices = std::move(inliners);
         }
     }
 
-    return inlinersBest;
+    // ostateczny podzial na inliery i outliery
+    std::vector<Point3D> inliersPoints;
+    std::vector<Point3D> outliersPoints;
+    inliersPoints.reserve(bestInliersIndices.size());
+    outliersPoints.reserve(cloud.size() - bestInliersIndices.size());
+
+    std::vector<bool> isInlier(cloud.size(), false); // maska logiczna
+    for (int idx : bestInliersIndices)
+    {
+        isInlier[idx] = true;
+    }
+
+    for (size_t i = 0; i < cloud.size(); i++)
+    {
+        if (isInlier[i])
+        {
+            inliersPoints.push_back(cloud[i]);
+        }
+        else
+        {
+            outliersPoints.push_back(cloud[i]);
+        }
+    }
+
+    return {inliersPoints, outliersPoints};
 }

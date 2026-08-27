@@ -1,6 +1,7 @@
 #include "KdTree.hpp"
 #include "PassThroughFilter.hpp"
 #include "PointCloud.hpp"
+#include "Ransac.hpp"
 #include "StatisticalOutlierRemoval.hpp"
 #include "VoxelGrid.hpp"
 #include <algorithm> // std::min, std::sort
@@ -82,7 +83,7 @@ int main()
 
     // 5. Zapisujemy do nowego pliku dla podgladu
     std::cout << "\n[INFO] Zapisuje zdownsamplowana chmure na dysk..." << std::endl;
-    if (filteredCloud.saveData("data/table_scene_lms400_downsampled.ply"))
+    if (filteredCloud.saveData("data/table_scene_lms400_voxel_downsampled.ply"))
     {
         std::cout << "[SUCCESS] Nowy plik zapisany!" << std::endl;
     }
@@ -151,6 +152,7 @@ int main()
     }
 
     // 9. TEST SOR FILTER (Usuwanie szumu)
+    std::vector<Point3D> cleanPoints;
     if (!filteredPts.empty())
     {
         int sor_k = 50;
@@ -165,7 +167,6 @@ int main()
         std::cout << "[INFO] Liczba inlierow: " << inliers.size() << " (usunieto "
                   << (filteredPts.size() - inliers.size()) << " punktow szumu!)" << std::endl;
         // Wyciąganie poprawnych punktów na podstawie zwróconych indeksów
-        std::vector<Point3D> cleanPoints;
         cleanPoints.reserve(inliers.size());
         for (int idx : inliers)
         {
@@ -180,6 +181,38 @@ int main()
             std::cout << "[SUCCESS] Plik table_scene_lms400_sor_filtered.ply zapisany pomyslnie!\n"
                       << std::endl;
         }
+    }
+
+    // 10. TEST RANSAC (Wykrywanie płaszczyzny stołu)
+    if (!cleanPoints.empty())
+    {
+        int ransac_iter = 1000;
+        float ransac_threshold = 0.015f;
+
+        std::cout << "\n[INFO] Uruchamiam RANSAC (Iteracje: " << ransac_iter
+                  << ", Prog: " << ransac_threshold << "m)..." << std::endl;
+
+        auto start_ransac = std::chrono::high_resolution_clock::now();
+        // Odbieramy pare wektorow
+        auto [tableInliers, objectsOutliers] =
+            findPlanes(cleanPoints, ransac_iter, ransac_threshold);
+        auto end_ransac = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double, std::milli> ransac_ms = end_ransac - start_ransac;
+
+        std::cout << "[CZAS] RANSAC zajal: " << ransac_ms.count() << " ms" << std::endl;
+        std::cout << "[INFO] Znaleziono blat stolu: " << tableInliers.size() << " punktow."
+                  << std::endl;
+        std::cout << "[INFO] Wyizolowano obiekty: " << objectsOutliers.size() << " punktow."
+                  << std::endl;
+
+        PointCloud tableCloud;
+        tableCloud.setPoints(tableInliers);
+        tableCloud.saveData("data/table_scene_lms400_ransac_table.ply");
+
+        PointCloud objectsCloud;
+        objectsCloud.setPoints(objectsOutliers);
+        objectsCloud.saveData("data/table_scene_lms400_ransac_objects.ply");
     }
 
     return 0;
