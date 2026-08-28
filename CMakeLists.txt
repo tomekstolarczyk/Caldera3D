@@ -11,4 +11,5 @@ add_executable(caldera
     src/StatisticalOutlierRemoval.cpp
     src/PassThroughFilter.cpp
     src/Ransac.cpp
+    src/EuclideanClustering.cpp
 )

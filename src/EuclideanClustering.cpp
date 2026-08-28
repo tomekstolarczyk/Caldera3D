@@ -63,6 +63,5 @@ std::vector<std::vector<Point3D>> euclideanClusterization(const std::vector<Poin
             }
         }
     }
-    std::cout << "Znalazlem klastrow: " << result.size() << std::endl;
     return result;
 }

@@ -1,3 +1,4 @@
+#include "EuclideanClustering.hpp"
 #include "KdTree.hpp"
 #include "PassThroughFilter.hpp"
 #include "PointCloud.hpp"
@@ -203,7 +204,8 @@ int main()
         std::cout << "[INFO] Znaleziono blat stolu: " << tableInliers.size() << " punktow."
                   << std::endl;
         std::cout << "[INFO] Wyizolowano obiekty (na stole): " << objectsOutliers.size()
-                  << " punktow." << std::endl;
+                  << " punktow." << std::endl
+                  << std::endl;
 
         // 3 Łączymy podłogę i stół
         std::vector<Point3D> combinedPlanes = floorInliers;
@@ -216,6 +218,25 @@ int main()
         PointCloud objectsCloud;
         objectsCloud.setPoints(objectsOutliers);
         objectsCloud.saveData("data/table_scene_lms400_ransac_objects.ply");
+    }
+
+    // 11 TEST CLUSTERING
+    std::cout << "[INFO] Rozpoczynam klastrowanie..." << std::endl;
+    PointCloud clusterCloud;
+    clusterCloud.loadData("data/table_scene_lms400_ransac_objects.ply");
+    KdTree clusterTree;
+    clusterTree.build(clusterCloud.getPoints());
+    std::vector<std::vector<Point3D>> clusters =
+        euclideanClusterization(clusterCloud.getPoints(), clusterTree, 0.03f);
+    std::cout << "[INFO] Znaleziono klastrow: " << clusters.size() << std::endl;
+    for (int i = 0; i < clusters.size(); i++)
+    {
+        PointCloud cluster;
+        cluster.setPoints(clusters[i]);
+        std::string fileName = "data/cluster_" + std::to_string(i) + ".ply";
+        cluster.saveData(fileName);
+        std::cout << " - Zapisano klaster " << i << " (punktów: " << clusters[i].size() << ")"
+                  << std::endl;
     }
 
     return 0;
