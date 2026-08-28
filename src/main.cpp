@@ -235,7 +235,7 @@ int main()
         cluster.setPoints(clusters[i]);
         std::string fileName = "data/cluster_" + std::to_string(i) + ".ply";
         cluster.saveData(fileName);
-        std::cout << " - Zapisano klaster " << i << " (punktów: " << clusters[i].size() << ")"
+        std::cout << " - Zapisano klaster " << i << " (punktow: " << clusters[i].size() << ")"
                   << std::endl;
     }
 

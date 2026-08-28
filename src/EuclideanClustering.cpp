@@ -53,7 +53,8 @@ std::vector<std::vector<Point3D>> euclideanClusterization(const std::vector<Poin
                 }
             }
 
-            if (klaster.size() < 5)
+            // szum
+            if (klaster.size() < 50)
             {
                 continue;
             }
