@@ -1,5 +1,6 @@
 #include "Ransac.hpp"
 #include "Math.hpp"
+#include <iostream>
 #include <random>
 
 ransacSinglePlaneResult ransacFindPlane(const std::vector<Point3D> &cloud, int k, float threshold)
@@ -26,7 +27,7 @@ ransacSinglePlaneResult ransacFindPlane(const std::vector<Point3D> &cloud, int k
     // 5 wybieramy najlepsza
     std::vector<int> bestInliersIndices;
     int maxCount = 0;
-    float bestA, bestB, bestC, bestD;
+    float bestA = 0.0f, bestB = 0.0f, bestC = 0.0f, bestD = 0.0f;
 
     // 4 powtarzamy proces k razy
     for (int iter = 0; iter < k; iter++)
@@ -144,14 +145,15 @@ ransacFinalResult ransacBulkSceneSegmentation(const std::vector<Point3D> &cloud,
     // przechodzimy kolejno przez znalezione plaszyzny - szukamy stolu - bedzie to pozioma plaszyzna
     // o najwyzszym Z
     float maxZ = -9999.0f;
-    float bestA, bestB, bestC, bestD;
+    float bestA = 0.0f, bestB = 0.0f, bestC = 0.0f, bestD = 0.0f;
     for (const auto &plane : extracedPlanes)
     {
         float denom = std::sqrt(plane.A * plane.A + plane.B * plane.B + plane.C * plane.C);
         float Cnormalized = std::abs(plane.C / denom);
 
+        // std::cout << "C = " << Cnormalized << std::endl;
         // czy plaszyzna pozioma
-        if (Cnormalized > 0.85f)
+        if (Cnormalized > 0.4f)
         {
             float sumZ = 0.0f;
             for (const auto &pt : plane.inliers)
@@ -168,6 +170,8 @@ ransacFinalResult ransacBulkSceneSegmentation(const std::vector<Point3D> &cloud,
                 bestC = plane.C;
                 bestD = plane.D;
             }
+
+            std::cout << "Znalazlem pozioma plaszczyzne z Z = " << avgZ << std::endl;
         }
     }
 
