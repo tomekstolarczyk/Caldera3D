@@ -179,8 +179,7 @@ int main()
         std::cout << "[INFO] Zapisuje odszumiona chmure na dysk..." << std::endl;
         if (cleanCloud.saveData("data/table_scene_lms400_sor_filtered.ply"))
         {
-            std::cout << "[SUCCESS] Plik table_scene_lms400_sor_filtered.ply zapisany pomyslnie!\n"
-                      << std::endl;
+            std::cout << "[SUCCESS] Plik table_scene_lms400_sor_filtered.ply zapisany pomyslnie!\n";
         }
     }
 
@@ -190,34 +189,30 @@ int main()
         int ransac_iter = 1000;
         float ransac_threshold = 0.015f;
 
-        std::cout << "\n[INFO] Uruchamiam RANSAC #1 (Szukanie podlogi)..." << std::endl;
         // 1 Wyciągamy pierwszą największą płaszczyznę
-        auto [floorInliers, floorOutliers] = findPlanes(cleanPoints, ransac_iter, ransac_threshold);
+        std::cout << "\n[INFO] Uruchamiam RANSAC #1 (Szukanie podlogi)..." << std::endl;
+        ransacResult res1 = findPlanes(cleanPoints, ransac_iter, ransac_threshold);
+        std::cout << "[INFO] Znaleziono podloge: " << res1.inliers.size() << " punktow."
+                  << std::endl;
 
-        std::cout << "[INFO] Uruchamiam RANSAC #2 (Szukanie stolu wsrod reszty)..." << std::endl;
         // 2 Wpuszczamy resztę chmury i znajdujemy drugą największą płaszczyznę
-        auto [tableInliers, objectsOutliers] =
-            findPlanes(floorOutliers, ransac_iter, ransac_threshold);
-
-        std::cout << "[INFO] Znaleziono podloge: " << floorInliers.size() << " punktow."
-                  << std::endl;
-        std::cout << "[INFO] Znaleziono blat stolu: " << tableInliers.size() << " punktow."
-                  << std::endl;
-        std::cout << "[INFO] Wyizolowano obiekty (na stole): " << objectsOutliers.size()
-                  << " punktow." << std::endl
+        std::cout << "[INFO] Uruchamiam RANSAC #2 (Szukanie stolu wsrod reszty)..." << std::endl;
+        ransacResult res2 = findPlanes(res1.outliers, ransac_iter, ransac_threshold);
+        std::cout << "[INFO] Znaleziono blat stolu: " << res2.inliers.size() << " punktow."
                   << std::endl;
 
         // 3 Łączymy podłogę i stół
-        std::vector<Point3D> combinedPlanes = floorInliers;
-        combinedPlanes.insert(combinedPlanes.end(), tableInliers.begin(), tableInliers.end());
+        std::vector<Point3D> combinedPlanes = res1.inliers;
+        combinedPlanes.insert(combinedPlanes.end(), res2.inliers.begin(), res2.inliers.end());
         PointCloud planesCloud;
         planesCloud.setPoints(combinedPlanes);
         planesCloud.saveData("data/table_scene_lms400_ransac_table.ply");
 
         // 4  Zapisujemy czyste obiekty do pliku objects
         PointCloud objectsCloud;
-        objectsCloud.setPoints(objectsOutliers);
+        objectsCloud.setPoints(res2.outliers);
         objectsCloud.saveData("data/table_scene_lms400_ransac_objects.ply");
+        std::cout << std::endl;
     }
 
     // 11 TEST CLUSTERING
