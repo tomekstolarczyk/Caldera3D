@@ -2,8 +2,7 @@
 #include "Math.hpp"
 #include <random>
 
-std::pair<std::vector<Point3D>, std::vector<Point3D>> findPlanes(const std::vector<Point3D> &cloud,
-                                                                 int k, float threshold)
+ransacResult findPlanes(const std::vector<Point3D> &cloud, int k, float threshold)
 {
     // okej a wiec  PRZEPIS:
     // x 1 losujemy 3 punkty z chmury
@@ -12,7 +11,6 @@ std::pair<std::vector<Point3D>, std::vector<Point3D>> findPlanes(const std::vect
     // inlinerow
     // x 4 powtarzamy proces k razy
     // x 5 wybieramy najlepsza iteracje
-    // - 7 update : adaptacyjna liczba iteracji : TODO
 
     // =============================================================================
 
@@ -28,6 +26,7 @@ std::pair<std::vector<Point3D>, std::vector<Point3D>> findPlanes(const std::vect
     // 5 wybieramy najlepsza
     std::vector<int> bestInliersIndices;
     int maxCount = 0;
+    float bestA, bestB, bestC, bestD;
 
     // 4 powtarzamy proces k razy
     for (int iter = 0; iter < k; iter++)
@@ -90,6 +89,10 @@ std::pair<std::vector<Point3D>, std::vector<Point3D>> findPlanes(const std::vect
         {
             maxCount = static_cast<int>(inliners.size());
             bestInliersIndices = std::move(inliners);
+            bestA = A;
+            bestB = B;
+            bestC = C;
+            bestD = D;
         }
     }
 
@@ -117,5 +120,5 @@ std::pair<std::vector<Point3D>, std::vector<Point3D>> findPlanes(const std::vect
         }
     }
 
-    return {inliersPoints, outliersPoints};
+    return {inliersPoints, outliersPoints, bestA, bestB, bestC, bestD};
 }
