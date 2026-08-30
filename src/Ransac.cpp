@@ -2,7 +2,7 @@
 #include "Math.hpp"
 #include <random>
 
-ransacResult findPlanes(const std::vector<Point3D> &cloud, int k, float threshold)
+ransacSinglePlaneResult ransacFindPlane(const std::vector<Point3D> &cloud, int k, float threshold)
 {
     // okej a wiec  PRZEPIS:
     // x 1 losujemy 3 punkty z chmury
@@ -121,4 +121,55 @@ ransacResult findPlanes(const std::vector<Point3D> &cloud, int k, float threshol
     }
 
     return {inliersPoints, outliersPoints, bestA, bestB, bestC, bestD};
+}
+
+ransacFinalResult ransacBulkSceneSegmentation(const std::vector<Point3D> &cloud, int k,
+                                              float threshold, int minPlaneSize)
+{
+    std::vector<Point3D> currentCloud = cloud;
+    std::vector<ransacSinglePlaneResult> extracedPlanes;
+
+    // wrzucamy plaszyzny do wora
+    while (true)
+    {
+        ransacSinglePlaneResult ransacRes = ransacFindPlane(currentCloud, k, threshold);
+        if (ransacRes.inliers.size() < minPlaneSize)
+        {
+            break;
+        }
+        extracedPlanes.push_back(ransacRes);
+        currentCloud = ransacRes.outliers;
+    }
+
+    // przechodzimy kolejno przez znalezione plaszyzny - szukamy stolu - bedzie to pozioma plaszyzna
+    // o najwyzszym Z
+    float maxZ = -9999.0f;
+    float bestA, bestB, bestC, bestD;
+    for (const auto &plane : extracedPlanes)
+    {
+        float denom = std::sqrt(plane.A * plane.A + plane.B * plane.B + plane.C * plane.C);
+        float Cnormalized = std::abs(plane.C / denom);
+
+        // czy plaszyzna pozioma
+        if (Cnormalized > 0.85f)
+        {
+            float sumZ = 0.0f;
+            for (const auto &pt : plane.inliers)
+            {
+                sumZ += pt.z;
+            }
+            float avgZ = sumZ / plane.inliers.size();
+
+            if (avgZ > maxZ)
+            {
+                maxZ = avgZ;
+                bestA = plane.A;
+                bestB = plane.B;
+                bestC = plane.C;
+                bestD = plane.D;
+            }
+        }
+    }
+
+    return {currentCloud, static_cast<int>(extracedPlanes.size()), bestA, bestB, bestC, bestD};
 }

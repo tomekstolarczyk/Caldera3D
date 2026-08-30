@@ -188,31 +188,28 @@ int main()
     {
         int ransac_iter = 1000;
         float ransac_threshold = 0.015f;
+        int min_plane_size = 5000; // Zakladamy, ze wszystko powyzej 5k to sciany/stoly
 
-        // 1 Wyciągamy pierwszą największą płaszczyznę
-        std::cout << "\n[INFO] Uruchamiam RANSAC #1 (Szukanie podlogi)..." << std::endl;
-        ransacResult res1 = findPlanes(cleanPoints, ransac_iter, ransac_threshold);
-        std::cout << "[INFO] Znaleziono podloge: " << res1.inliers.size() << " punktow."
+        std::cout << "\n[INFO] Uruchamiam RANSAC Bulk Scene Segmentation..." << std::endl;
+
+        // Wywolujemy
+        ransacFinalResult scene =
+            ransacBulkSceneSegmentation(cleanPoints, ransac_iter, ransac_threshold, min_plane_size);
+
+        std::cout << "[INFO] Segmentacja zakonczona!" << std::endl;
+        std::cout << "[INFO] Liczba znalezionych plaszyzn: " << scene.planesFound << std::endl;
+        std::cout << "[INFO] Rownanie blatu stolu: " << scene.tableA << "x + " << scene.tableB
+                  << "y + " << scene.tableC << "z + " << scene.tableD << " = 0" << std::endl;
+
+        std::cout << "[INFO] Liczba punktow pozostalych obiektow: " << scene.objects.size()
                   << std::endl;
 
-        // 2 Wpuszczamy resztę chmury i znajdujemy drugą największą płaszczyznę
-        std::cout << "[INFO] Uruchamiam RANSAC #2 (Szukanie stolu wsrod reszty)..." << std::endl;
-        ransacResult res2 = findPlanes(res1.outliers, ransac_iter, ransac_threshold);
-        std::cout << "[INFO] Znaleziono blat stolu: " << res2.inliers.size() << " punktow."
-                  << std::endl;
-
-        // 3 Łączymy podłogę i stół
-        std::vector<Point3D> combinedPlanes = res1.inliers;
-        combinedPlanes.insert(combinedPlanes.end(), res2.inliers.begin(), res2.inliers.end());
-        PointCloud planesCloud;
-        planesCloud.setPoints(combinedPlanes);
-        planesCloud.saveData("data/table_scene_lms400_ransac_table.ply");
-
-        // 4  Zapisujemy czyste obiekty do pliku objects
+        // Zapisujemy TYLKO czyste obiekty do pliku
         PointCloud objectsCloud;
-        objectsCloud.setPoints(res2.outliers);
+        objectsCloud.setPoints(scene.objects);
         objectsCloud.saveData("data/table_scene_lms400_ransac_objects.ply");
-        std::cout << std::endl;
+
+        std::cout << "[SUCCESS] Zapisano obiekty do klastrowania!" << std::endl << std::endl;
     }
 
     // 11 TEST CLUSTERING
