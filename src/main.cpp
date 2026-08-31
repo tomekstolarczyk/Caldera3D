@@ -245,8 +245,8 @@ int main()
         cluster.setPoints(clustersAboveTable[i]);
         std::string fileName = "data/cluster_above_the_table_" + std::to_string(i) + ".ply";
         cluster.saveData(fileName);
-        std::cout << " - Zapisano klaster nad stolem " << i << " (punktow: " << clusters[i].size()
-                  << ")" << std::endl;
+        std::cout << " - Zapisano klaster nad stolem " << i
+                  << " (punktow: " << clustersAboveTable[i].size() << ")" << std::endl;
     }
 
     return 0;
