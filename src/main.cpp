@@ -3,6 +3,7 @@
 #include "PassThroughFilter.hpp"
 #include "PointCloud.hpp"
 #include "Ransac.hpp"
+#include "SpatialFilter.hpp"
 #include "StatisticalOutlierRemoval.hpp"
 #include "VoxelGrid.hpp"
 #include <algorithm> // std::min, std::sort
@@ -184,6 +185,7 @@ int main()
     }
 
     // 10. TEST RANSAC
+    ransacFinalResult scene;
     if (!cleanPoints.empty())
     {
         int ransac_iter = 1000;
@@ -193,7 +195,7 @@ int main()
         std::cout << "\n[INFO] Uruchamiam RANSAC Bulk Scene Segmentation..." << std::endl;
 
         // Wywolujemy
-        ransacFinalResult scene =
+        scene =
             ransacBulkSceneSegmentation(cleanPoints, ransac_iter, ransac_threshold, min_plane_size);
 
         std::cout << "[INFO] Segmentacja zakonczona!" << std::endl;
@@ -229,6 +231,22 @@ int main()
         cluster.saveData(fileName);
         std::cout << " - Zapisano klaster " << i << " (punktow: " << clusters[i].size() << ")"
                   << std::endl;
+    }
+    std::cout << std::endl;
+
+    // 12 Test Spatial Filter - odrzucamy wszystko co nie lezy nad stolem
+    std::cout << "[INFO] Odrzucam klastry ktore nie leza nad stolem..." << std::endl;
+    std::vector<std::vector<Point3D>> clustersAboveTable =
+        everythingAboveTheTable(clusters, scene.tableA, scene.tableB, scene.tableC, scene.tableD);
+    std::cout << "[INFO] Znaleziono klastrow na stole: " << clustersAboveTable.size() << std::endl;
+    for (int i = 0; i < clustersAboveTable.size(); i++)
+    {
+        PointCloud cluster;
+        cluster.setPoints(clustersAboveTable[i]);
+        std::string fileName = "data/cluster_above_the_table_" + std::to_string(i) + ".ply";
+        cluster.saveData(fileName);
+        std::cout << " - Zapisano klaster nad stolem " << i << " (punktow: " << clusters[i].size()
+                  << ")" << std::endl;
     }
 
     return 0;

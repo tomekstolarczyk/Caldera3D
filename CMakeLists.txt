@@ -12,4 +12,5 @@ add_executable(caldera
     src/PassThroughFilter.cpp
     src/Ransac.cpp
     src/EuclideanClustering.cpp
+    src/SpatialFilter.cpp
 )
