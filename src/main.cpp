@@ -1,5 +1,6 @@
 #include "EuclideanClustering.hpp"
 #include "KdTree.hpp"
+#include "PCA.hpp"
 #include "PassThroughFilter.hpp"
 #include "PointCloud.hpp"
 #include "Ransac.hpp"
@@ -247,6 +248,13 @@ int main()
         cluster.saveData(fileName);
         std::cout << " - Zapisano klaster nad stolem " << i
                   << " (punktow: " << clustersAboveTable[i].size() << ")" << std::endl;
+    }
+
+    // JUST A TEST IF EIGEN WORKS
+    if (!clustersAboveTable.empty())
+    {
+        std::cout << "\n\n[INFO] Testuje kompilacje Eigena..." << std::endl;
+        OBB testBox = findOBB(clustersAboveTable[0]);
     }
 
     return 0;
