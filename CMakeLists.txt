@@ -17,6 +17,7 @@ add_executable(caldera
     src/EuclideanClustering.cpp
     src/SpatialFilter.cpp
     src/PCA.cpp
+    src/TargetMatching.cpp
 )
 
 # eigen

@@ -6,6 +6,7 @@
 #include "Ransac.hpp"
 #include "SpatialFilter.hpp"
 #include "StatisticalOutlierRemoval.hpp"
+#include "TargetMatching.hpp"
 #include "VoxelGrid.hpp"
 #include <algorithm> // std::min, std::sort
 #include <chrono>    // pomiar czasu
@@ -250,7 +251,7 @@ int main()
                   << " (punktow: " << clustersAboveTable[i].size() << ")" << std::endl;
     }
 
-    // JUST A TEST IF EIGEN WORKS
+    // 13 PCA - finding a bounding box
     if (!clustersAboveTable.empty())
     {
         std::cout << "\n\n[INFO] Finding OOB..." << std::endl;
@@ -263,6 +264,26 @@ int main()
                   << boundingBox.length << ", " << boundingBox.width << ", " << boundingBox.height
                   << "\n";
         std::cout << "Rotation Matrix:\n" << boundingBox.rotationAxes << "\n";
+    }
+
+    // 14 TARGET MATCHING
+    std::cout << std::endl
+              << "[TARGET MATCHER] Looking for  a 15 cm x 8 cm x 6 cm package: " << std::endl;
+    std::vector<OBB> allBoxes;
+    allBoxes.reserve(clustersAboveTable.size());
+    for (const auto &cluster : clustersAboveTable)
+    {
+        allBoxes.push_back(findOBB(cluster));
+    }
+    int matchedIdx = matchTargetBox(allBoxes, 0.15f, 0.08f, 0.06f, 0.02f);
+    if (matchedIdx != -1)
+    {
+        std::cout << "[TARGET FOUND] Dopasowano klaster w liscie paczek o indexie: " << matchedIdx
+                  << std::endl;
+    }
+    else
+    {
+        std::cout << "[TARGET NOT FOUND] Brak pudelka o podanych wymiarach." << std::endl;
     }
 
     return 0;
