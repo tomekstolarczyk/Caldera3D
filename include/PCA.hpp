@@ -7,9 +7,9 @@
 // Oriented Bounding Box
 struct OBB
 {
-    float length;
-    float width;
     float height;
+    float width;
+    float length;
     Point3D centroid;
     Eigen::Matrix3f rotationAxes; // save eigenvectors for future grasp pose estimation
 };
