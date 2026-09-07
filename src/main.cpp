@@ -1,4 +1,5 @@
 #include "EuclideanClustering.hpp"
+#include "GraspPoseEstimation.hpp"
 #include "KdTree.hpp"
 #include "PCA.hpp"
 #include "PassThroughFilter.hpp"
@@ -266,7 +267,7 @@ int main()
         std::cout << "Rotation Matrix:\n" << boundingBox.rotationAxes << "\n";
     }
 
-    // 14 TARGET MATCHING
+    // 14 TARGET MATCHING & 15 GRASP POSE ESTIMATION
     std::cout << std::endl
               << "[TARGET MATCHER] Looking for  a 15 cm x 8 cm x 6 cm package: " << std::endl;
     std::vector<OBB> allBoxes;
@@ -276,10 +277,26 @@ int main()
         allBoxes.push_back(findOBB(cluster));
     }
     int matchedIdx = matchTargetBox(allBoxes, 0.15f, 0.08f, 0.06f, 0.02f);
+
     if (matchedIdx != -1)
     {
-        std::cout << "[TARGET FOUND] Dopasowano klaster w liscie paczek o indexie: " << matchedIdx
-                  << std::endl;
+        std::cout << "[TARGET FOUND] Dopasowano klaster o indexie: " << matchedIdx << std::endl;
+
+        // Wyliczamy pozycję chwytu
+        GraspPose maniEndPose = computeGraspPose(allBoxes[matchedIdx], scene.tableA, scene.tableB,
+                                                 scene.tableC, scene.tableD);
+
+        std::cout << "\n=========================================\n";
+        std::cout << "[FINAL OUTPUT] GRASP POSE (6-DoF):\n";
+        std::cout << "Pozycja TCP (Tool Center Point - X, Y, Z):\n"
+                  << maniEndPose.position.x() << ", " << maniEndPose.position.y() << ", "
+                  << maniEndPose.position.z() << "\n";
+        std::cout << "Macierz orientacji chwytaka (Z w gore):\n" << maniEndPose.orientation << "\n";
+        std::cout << "Krotszy bok paczki - docelowy rozstaw szczek (Package Width):  "
+                  << maniEndPose.targetWidth * 1000.0f << " mm\n";
+        std::cout << "Dluzszy bok chwytanej paczki (Package Length): "
+                  << maniEndPose.targetLength * 1000.0f << " mm\n";
+        std::cout << "=========================================\n";
     }
     else
     {

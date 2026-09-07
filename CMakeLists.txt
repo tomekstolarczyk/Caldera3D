@@ -18,6 +18,7 @@ add_executable(caldera
     src/SpatialFilter.cpp
     src/PCA.cpp
     src/TargetMatching.cpp
+    src/GraspPoseEstimation.cpp
 )
 
 # eigen
