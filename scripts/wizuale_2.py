@@ -34,9 +34,21 @@ offset = extent_x + 0.2
 for cluster in final_clusters:
     cluster.translate([offset, 0.0, 0.0])
 
-# 4 final visu
-print("Wizualizacja: [Oryginał] -> [Wyizolowana paczka]")
-geometries = [cloud_orig] + final_clusters
+# bounding box (values fixed for now)
+center = np.array([-0.16493, 0.304941, -1.31351])
+R = np.array([
+    [ 0.0727719, -0.996574,  -0.0392906],
+    [-0.470329,  -0.0690306,  0.879787],
+    [ 0.879486,   0.0455443,  0.473741]
+])
+extent = np.array([0.0610219, 0.0825348, 0.155759])
+obb = o3d.geometry.OrientedBoundingBox(center, R, extent)
+obb.color = (1.0, 0.0, 0.0) # red
+obb.translate([offset, 0.0, 0.0])
+
+# 5 final visu
+print("Wizualizacja: [Oryginał] -> [Wyizolowana paczka z OBB]")
+geometries = [cloud_orig] + final_clusters + [obb]
 o3d.visualization.draw_geometries(
     geometries,
     window_name="Caldera3D - Wyizolowany Target",

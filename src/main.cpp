@@ -253,8 +253,16 @@ int main()
     // JUST A TEST IF EIGEN WORKS
     if (!clustersAboveTable.empty())
     {
-        std::cout << "\n\n[INFO] Testuje kompilacje Eigena..." << std::endl;
-        OBB testBox = findOBB(clustersAboveTable[0]);
+        std::cout << "\n\n[INFO] Finding OOB..." << std::endl;
+        OBB boundingBox = findOBB(clustersAboveTable[0]);
+
+        std::cout << "Centroid:\n"
+                  << boundingBox.centroid.x << ", " << boundingBox.centroid.y << ", "
+                  << boundingBox.centroid.z << "\n";
+        std::cout << "Extents (L, W, H):\n"
+                  << boundingBox.length << ", " << boundingBox.width << ", " << boundingBox.height
+                  << "\n";
+        std::cout << "Rotation Matrix:\n" << boundingBox.rotationAxes << "\n";
     }
 
     return 0;
