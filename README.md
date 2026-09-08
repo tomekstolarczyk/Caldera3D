@@ -1,6 +1,14 @@
 # Caldera3D 🌋
 
-An ultra-fast 3D point cloud processor designed for autonomous manipulator bin-picking tasks. Written in C++ with Python bindings.
+[![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white)](https://en.cppreference.com/w/cpp/17)
+[![CMake](https://img.shields.io/badge/CMake-3.14+-064F8C?logo=cmake&logoColor=white)](https://cmake.org/)
+[![Eigen](https://img.shields.io/badge/Eigen-3.4-D12424)](https://eigen.tuxfamily.org/)
+
+**An ultra-fast 3D point cloud processor designed for autonomous manipulator bin-picking tasks. Written in C++ with Python bindings.**
+
+<p align="center">
+  <img src="caldera3d_dynamic.gif" width="80%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
+</p>
 
 ## Core Features & Processing Pipeline
 
@@ -15,7 +23,13 @@ Caldera3D processes point clouds through a highly optimized pipeline, designed s
 *   **Dimensional Analysis & Target Matching:** Principal Component Analysis (PCA) is used to compute accurate Oriented Bounding Boxes (OBB). The engine calculates exact dimensions (L/W/H in mm) to find and match specific items requested by a factory PLC (e.g., "find the 20x15 cm package").
 *   **Robotic Integration (Grasp Pose Estimation):** Intelligent 6-DoF grasp calculation that determines the safest approach angle to avoid table/object collisions, outputting Universal TCP coordinates and stroke limits for parallel jaw grippers.
 *   **Debugging Tools:** Includes complementary Python scripts utilizing Open3D for visual verification of the C++ pipeline outputs.
-```
+<br><br>
+---
+<br><br>
+<p align="center">
+  <img src="caldera3d.png" width="80%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
+</p>
+<br><br>
 
 ## License
 This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for details.

@@ -38,6 +38,7 @@ cloud_sor = color_by_z(cloud_sor)
 
 cloud_table.paint_uniform_color([0.8, 0.0, 0.0])   
 cloud_objects.paint_uniform_color([0.0, 0.8, 0.0]) 
+
 target_cloud.paint_uniform_color([0.0, 1.0, 0.0]) 
 
 obb_center = np.array([-0.164993, 0.300963, -1.31584])
@@ -61,39 +62,54 @@ gripper_frame.rotate(tcp_R, center=(0, 0, 0))
 gripper_frame.translate(tcp_position)
 
 # 3. STORYBOARD 
+target_center = target_cloud.get_center()
+background_clusters = []
+for c in cluster_clouds:
+    if np.linalg.norm(c.get_center() - target_center) > 0.01:
+        background_clusters.append(c)
+
 scenes = [
     {"name": "1. Oryginal", "geoms": [cloud_orig], "zoom": False},
     {"name": "2. Voxel", "geoms": [cloud_down], "zoom": False},
     {"name": "3. SOR", "geoms": [cloud_sor], "zoom": False},
     {"name": "4. RANSAC", "geoms": [cloud_table, cloud_objects], "zoom": False},
-    {"name": "5. Clusters", "geoms": cluster_clouds, "zoom": False},
-    {"name": "6. Target (Wyizolowany)", "geoms": [target_cloud], "zoom": True},
-    {"name": "7. Target + OBB", "geoms": [target_cloud, obb], "zoom": True},
-    {"name": "8. Target + OBB + Grasp", "geoms": [target_cloud, obb, gripper_frame], "zoom": True}
+    {"name": "5. Clusters (Wszystkie)", "geoms": cluster_clouds, "zoom": False},
+    {"name": "6. Target (Podswietlony)", "geoms": background_clusters + [target_cloud], "zoom": False},     
+    {"name": "7. Target (Wyizolowany)", "geoms": [target_cloud], "zoom": True},
+    {"name": "8. Target + OBB", "geoms": [target_cloud, obb], "zoom": True},
+    {"name": "9. Target + OBB + Grasp", "geoms": [target_cloud, obb, gripper_frame], "zoom": True}
 ]
 
-# 4. FUNKCJA RENDERUJACA
+# 4. FUNKCJA RENDERUJACA 
 def generate_gif(filename, rotate=False):
     print(f"\n--- Generowanie: {filename} ---")
     vis = o3d.visualization.Visualizer()
     vis.create_window(window_name=f"Caldera3D - {filename}", width=1280, height=720, visible=True)
 
     frames = []
+    zoom_applied = False
     
     for scene_idx, scene in enumerate(scenes):
         print(f"Tworze kadr: {scene['name']}")
+        ctr = vis.get_view_control()
+        cam_params = ctr.convert_to_pinhole_camera_parameters() if scene_idx > 0 else None
+
         vis.clear_geometries()
         
         for geom in scene["geoms"]:
             vis.add_geometry(geom, reset_bounding_box=(scene_idx == 0))
             
-        ctr = vis.get_view_control()
+        if cam_params is not None:
+            ctr.convert_from_pinhole_camera_parameters(cam_params)
+
         frames_per_scene = 25 
         
         if scene["zoom"]:
-            ctr.set_lookat(obb_center)
-            ctr.set_zoom(0.4) 
             frames_per_scene = 40 
+            if not zoom_applied:
+                ctr.set_lookat(obb_center)
+                ctr.set_zoom(0.4) 
+                zoom_applied = True
 
         for frame_idx in range(frames_per_scene):
             if rotate:
@@ -107,11 +123,11 @@ def generate_gif(filename, rotate=False):
             frames.append(img)
 
     vis.destroy_window()
-    print(f"Zapisywanie {filename} (15 FPS)...")
-    imageio.mimsave(filename, frames, fps=15)
+    print(f"Zapisywanie {filename} (15 FPS, zapętlone)...")
+    imageio.mimsave(filename, frames, fps=15, loop=0)
 
 # 5. ODPALENIE GENERATOROW
 generate_gif("caldera3d_static.gif", rotate=False)
 generate_gif("caldera3d_dynamic.gif", rotate=True)
 
-print("\nGotowe :)")
+print("\nSukces!")
