@@ -24,9 +24,9 @@ Caldera3D processes point clouds through a highly optimized pipeline, designed s
 *   **Robotic Integration (Grasp Pose Estimation):** Intelligent 6-DoF grasp calculation that determines the safest approach angle to avoid table/object collisions, outputting Universal TCP coordinates and stroke limits for parallel jaw grippers.
 *   **Debugging Tools:** Includes complementary Python scripts utilizing Open3D for visual verification of the C++ pipeline outputs.
 <br><br>
----
 <p align="center">
-  <img src="caldera3d.png" width="80%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
+  <img src="caldera3d.png" width="95%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
 </p>
+
 ## License
 This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for details.
