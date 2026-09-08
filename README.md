@@ -7,7 +7,7 @@
 **An ultra-fast 3D point cloud processor designed for autonomous manipulator bin-picking tasks. Written in C++ with Python bindings.**
 
 <p align="center">
-  <img src="caldera3d_dynamic.gif" width="80%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
+  <img src="media/caldera3d_dynamic.gif" width="80%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
 </p>
 
 ## Core Features & Processing Pipeline
@@ -25,7 +25,7 @@ Caldera3D processes point clouds through a highly optimized pipeline, designed s
 10) **Debugging Tools:** Includes complementary Python scripts utilizing Open3D for visual verification of the C++ pipeline outputs.
 <br><br>
 <p align="center">
-  <img src="caldera3d.png" width="95%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
+  <img src="media/caldera3d.png" width="95%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
 </p>
 
 ## License
