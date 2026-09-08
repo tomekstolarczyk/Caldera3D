@@ -6,17 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 
-# 1. download pybind
-include(FetchContent)
-FetchContent_Declare(
-    pybind11
-    GIT_REPOSITORY https://github.com/pybind/pybind11.git
-    GIT_TAG        v2.13.6
-)
-FetchContent_MakeAvailable(pybind11)
-
-# 2. srces
-set(CALDERA_SOURCES 
+add_executable(caldera 
+    src/main.cpp 
     src/PointCloud.cpp 
     src/VoxelGrid.cpp 
     src/KdTree.cpp 
@@ -30,10 +21,5 @@ set(CALDERA_SOURCES
     src/GraspPoseEstimation.cpp
 )
 
-# 3. .EXE 
-add_executable(caldera src/main.cpp ${CALDERA_SOURCES})
+# eigen
 target_include_directories(caldera PRIVATE ${CMAKE_SOURCE_DIR}/external)
-
-# 4. .pyd / .so
-pybind11_add_module(caldera_engine src/bindings.cpp ${CALDERA_SOURCES})
-target_include_directories(caldera_engine PRIVATE ${CMAKE_SOURCE_DIR}/external)
