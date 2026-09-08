@@ -25,11 +25,8 @@ Caldera3D processes point clouds through a highly optimized pipeline, designed s
 *   **Debugging Tools:** Includes complementary Python scripts utilizing Open3D for visual verification of the C++ pipeline outputs.
 <br><br>
 ---
-<br><br>
 <p align="center">
   <img src="caldera3d.png" width="80%" style="border-radius: 6px;" alt="Inverse Kinematics Demo" />
 </p>
-<br><br>
-
 ## License
 This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for details.
