@@ -1,6 +1,5 @@
 #pragma once
 #include "PointCloud.hpp"
-#include <utility> // std::pair
 #include <vector>
 
 struct ransacSinglePlaneResult

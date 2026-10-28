@@ -1,5 +1,6 @@
 #include "Ransac.hpp"
 #include "Math.hpp"
+#include <cmath>
 #include <iostream>
 #include <random>
 

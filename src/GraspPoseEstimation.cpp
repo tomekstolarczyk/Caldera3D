@@ -1,4 +1,5 @@
 #include "GraspPoseEstimation.hpp"
+#include <vector>
 
 GraspPose computeGraspPose(const OBB &box, float tableA, float tableB, float tableC, float tableD)
 {

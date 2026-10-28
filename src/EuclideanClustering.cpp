@@ -1,5 +1,4 @@
 #include "EuclideanClustering.hpp"
-#include <iostream>
 #include <queue>
 
 std::vector<std::vector<Point3D>> euclideanClusterization(const std::vector<Point3D> &pointCloud,

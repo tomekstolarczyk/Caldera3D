@@ -1,6 +1,5 @@
 #pragma once
 #include "PointCloud.hpp"
-#include <cmath>
 
 namespace Math3D
 {

@@ -1,5 +1,6 @@
 #include "PCA.hpp"
-#include <iostream>
+#include <algorithm>
+#include <limits>
 
 OBB findOBB(const std::vector<Point3D> &clusterCloud)
 {
