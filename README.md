@@ -30,6 +30,19 @@ Output: the object that matches a requested size (for example "the 20 × 15 cm p
 
 Python scripts using Open3D visualise the output of each stage.
 
+## Build and run
+
+```bash
+cmake -S . -B build
+cmake --build build -j
+ctest --test-dir build                       # unit tests (GoogleTest, fetched by CMake)
+
+python3 scripts/download_data.py             # PCL table scene -> data/table_scene_lms400.ply
+./build/caldera data/table_scene_lms400.ply  # full pipeline, intermediate clouds go to data/
+```
+
+The core algorithms build as the `caldera_core` library; `caldera` is the demo executable. Tests compare the k-d tree against brute-force search and cover edge cases (empty input, a single point, duplicate points, k larger than the cloud).
+
 <p align="center">
   <img src="media/caldera3d.png" width="95%" style="border-radius: 6px;" alt="Pipeline stages visualised in Open3D" />
 </p>

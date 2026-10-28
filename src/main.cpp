@@ -11,7 +11,9 @@
 #include "VoxelGrid.hpp"
 #include <algorithm> // std::min, std::sort
 #include <chrono>    // pomiar czasu
+#include <filesystem>
 #include <iostream>
+#include <string>
 #include <vector>
 
 // just for testing
@@ -34,8 +36,12 @@ static std::vector<int> bruteForceRadius(const std::vector<Point3D> &cloud, cons
     return indices;
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    // usage: caldera [input.ply]  (default: data/table_scene_lms400.ply, see scripts/download_data.py)
+    const std::string inputPath = argc > 1 ? argv[1] : "data/table_scene_lms400.ply";
+    std::filesystem::create_directories("data"); // intermediate results for the visualisation scripts
+
     std::cout << "===================" << std::endl;
     std::cout << "     Caldera3D     " << std::endl;
     std::cout << "===================" << std::endl;
@@ -43,9 +49,10 @@ int main()
     PointCloud rawCloud;
 
     // 1. Wczytujemy cala surowa chmure do pamieci
-    if (!rawCloud.loadData("data/table_scene_lms400.ply"))
+    if (!rawCloud.loadData(inputPath))
     {
-        std::cout << "[FATAL] Nie udalo sie wczytac pliku :(" << std::endl;
+        std::cout << "[FATAL] Nie udalo sie wczytac pliku :( " << inputPath << std::endl;
+        std::cout << "        Run: python3 scripts/download_data.py" << std::endl;
         return -1;
     }
 
@@ -219,12 +226,10 @@ int main()
 
     // 11 TEST CLUSTERING
     std::cout << "[INFO] Rozpoczynam klastrowanie..." << std::endl;
-    PointCloud clusterCloud;
-    clusterCloud.loadData("data/table_scene_lms400_ransac_objects.ply");
     KdTree clusterTree;
-    clusterTree.build(clusterCloud.getPoints());
+    clusterTree.build(scene.objects);
     std::vector<std::vector<Point3D>> clusters =
-        euclideanClusterization(clusterCloud.getPoints(), clusterTree, 0.03f);
+        euclideanClusterization(scene.objects, clusterTree, 0.03f);
     std::cout << "[INFO] Znaleziono klastrow: " << clusters.size() << std::endl;
     for (int i = 0; i < clusters.size(); i++)
     {

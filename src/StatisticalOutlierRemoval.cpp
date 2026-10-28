@@ -1,6 +1,38 @@
 #include "StatisticalOutlierRemoval.hpp"
 #include <cmath>
 
+MeanStdDev computeMeanStdDev(const std::vector<float> &values)
+{
+    if (values.empty())
+    {
+        return {0.0, 0.0};
+    }
+
+    double sum = 0.0;
+    for (float v : values)
+    {
+        sum += v;
+    }
+    const double mean = sum / static_cast<double>(values.size());
+
+    if (values.size() < 2)
+    {
+        return {mean, 0.0};
+    }
+
+    // two-pass: sum of squared deviations from the mean
+    // the one-pass E[x^2] - E[x]^2 formula in float cancels catastrophically when
+    // stddev << mean (very uniform point spacing, e.g. after voxelization): at mean/stddev ~ 1000
+    // it returns a negative variance, which used to collapse the threshold to the mean
+    double sqDevSum = 0.0;
+    for (float v : values)
+    {
+        const double dev = static_cast<double>(v) - mean;
+        sqDevSum += dev * dev;
+    }
+    return {mean, std::sqrt(sqDevSum / static_cast<double>(values.size() - 1))};
+}
+
 std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tree, int k,
                            float alpha)
 {
@@ -21,8 +53,6 @@ std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tre
 
     // 2. dla kazdego punktu liczymy jego srednia odleglosc do k sasiadow
     std::vector<float> mean_dists(points.size());
-    float dist_sum = 0.0f;    // przyda nam sie do wariancji
-    float dist_sq_sum = 0.0f; // przyda nam sie do wariancji
     for (int i = 0; i < points.size(); i++)
     {
 
@@ -45,25 +75,13 @@ std::vector<int> filterSOR(const std::vector<Point3D> &points, const KdTree &tre
 
         dist = dist / (indexy.size() - 1);
         mean_dists[i] = dist;
-        dist_sum += dist;
-        dist_sq_sum += dist * dist;
     }
 
-    // 3. srednia globalna
-    float global_mean = dist_sum / points.size();
-
-    // 4. wariancja
-    float var = (dist_sq_sum - (((dist_sum) * (dist_sum)) / points.size())) / (points.size() - 1);
-    if (var < 0.0f)
-    {
-        var = 0.0f;
-    }
-
-    // 5. odchylenie standardowe
-    float stddev = static_cast<float>(std::sqrt(var));
+    // 3-5. srednia globalna i odchylenie standardowe
+    const MeanStdDev stats = computeMeanStdDev(mean_dists);
 
     // 6. prog odcinajacy
-    float threshold = global_mean + alpha * stddev;
+    float threshold = static_cast<float>(stats.mean + alpha * stats.stddev);
 
     // 7. wynik
     std::vector<int> results;
