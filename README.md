@@ -48,5 +48,5 @@ The core algorithms build as the `caldera_core` library; `caldera` is the demo e
 </p>
 
 ## License
+This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for details.
 
-MIT. See the [LICENSE](LICENSE) file for details.
